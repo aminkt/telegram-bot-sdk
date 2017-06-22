@@ -1,5 +1,5 @@
 {
-  "name": "irazasyed/telegram-bot-sdk",
+  "name": "aminkt/telegram-bot-sdk",
   "description": "The Unofficial Telegram Bot API PHP SDK based on irazasyed/telegram-bot-sdk",
   "keywords": ["telegram", "telegram bot", "telegram bot api", "telegram sdk", "telegram php", "laravel telegram", "laravel"],
   "type": "library",
