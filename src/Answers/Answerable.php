@@ -52,7 +52,7 @@ trait Answerable
                 throw new \BadMethodCallException("No chat available for reply with [$method].");
             }
 
-            $chat_id = $chat->id;
+            $chat_id = $chat->getId();
 
             $params = array_merge(compact('chat_id'), $arguments[0]);
 
