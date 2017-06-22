@@ -33,9 +33,5 @@ namespace Telegram\Bot\Objects\InlineQuery;
  */
 class InlineQueryResultContact extends InlineBaseObject
 {
-    public function __construct($params = [])
-    {
-        parent::__construct($params);
-        $this->put('type', 'contact');
-    }
+    protected $type = 'contact';
 }

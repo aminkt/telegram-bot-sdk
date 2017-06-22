@@ -9,14 +9,10 @@ use Telegram\Bot\TelegramResponse;
  */
 class TelegramResponseException extends TelegramSDKException
 {
-    /**
-     * @var TelegramResponse The response that threw the exception.
-     */
+    /** @var TelegramResponse The response that threw the exception. */
     protected $response;
 
-    /**
-     * @var array Decoded response.
-     */
+    /** @var array Decoded response. */
     protected $responseData;
 
     /**
@@ -34,6 +30,23 @@ class TelegramResponseException extends TelegramSDKException
         $errorCode = $this->get('error_code', -1);
 
         parent::__construct($errorMessage, $errorCode, $previousException);
+    }
+
+    /**
+     * Checks isset and returns that or a default value.
+     *
+     * @param string $key
+     * @param mixed  $default
+     *
+     * @return mixed
+     */
+    protected function get($key, $default = null)
+    {
+        if (isset($this->responseData[$key])) {
+            return $this->responseData[$key];
+        }
+
+        return $default;
     }
 
     /**
@@ -56,23 +69,6 @@ class TelegramResponseException extends TelegramSDKException
 
         // Others
         return new static($response, new TelegramOtherException($message, $code));
-    }
-
-    /**
-     * Checks isset and returns that or a default value.
-     *
-     * @param string $key
-     * @param mixed  $default
-     *
-     * @return mixed
-     */
-    private function get($key, $default = null)
-    {
-        if (isset($this->responseData[$key])) {
-            return $this->responseData[$key];
-        }
-
-        return $default;
     }
 
     /**

@@ -17,8 +17,6 @@ abstract class BaseObject extends Collection
     public function __construct($data)
     {
         parent::__construct($this->getRawResult($data));
-
-        $this->mapRelatives();
     }
 
     /**
@@ -27,6 +25,54 @@ abstract class BaseObject extends Collection
      * @return array
      */
     abstract public function relations();
+
+    /**
+     * Magically access collection data.
+     *
+     * @param $property
+     *
+     * @return mixed
+     */
+    public function __get($property)
+    {
+        return $this->getPropertyValue($property);
+    }
+
+    /**
+     * Magically map to an object class (if exists) and return data.
+     *
+     * @param      $property
+     * @param null $default
+     *
+     * @return mixed
+     */
+    protected function getPropertyValue($property, $default = null)
+    {
+        $property = snake_case($property);
+        if (!$this->offsetExists($property)) {
+            return value($default);
+        }
+
+        $value = $this->items[$property];
+
+        $relations = $this->relations();
+        if (isset($relations[$property])) {
+            return $relations[$property]::make($value);
+        }
+
+        /** @var BaseObject $class */
+        $class = 'Telegram\Bot\Objects\\'.studly_case($property);
+
+        if (class_exists($class)) {
+            return $class::make($value);
+        }
+
+        if (is_array($value)) {
+            return TelegramObject::make($value);
+        }
+
+        return $value;
+    }
 
     /**
      * Get an item from the collection by key.
@@ -38,38 +84,13 @@ abstract class BaseObject extends Collection
      */
     public function get($key, $default = null)
     {
-        if ($this->offsetExists($key)) {
-            return is_array($this->items[$key]) ? new static($this->items[$key]) : $this->items[$key];
+        $value = parent::get($key, $default);
+
+        if (!is_null($value) && is_array($value)) {
+            return $this->getPropertyValue($key, $default);
         }
 
-        return value($default);
-    }
-
-    /**
-     * Map property relatives to appropriate objects.
-     *
-     * @return array|void
-     */
-    public function mapRelatives()
-    {
-        $relations = collect($this->relations());
-
-        if ($relations->isEmpty()) {
-            return false;
-        }
-
-        return $this->items = collect($this->all())
-            ->map(function ($value, $key) use ($relations) {
-
-                if ($relations->has($key)) {
-                    $className = $relations->get($key);
-
-                    return new $className($value);
-                }
-
-                return $value;
-            })
-            ->all();
+        return $value;
     }
 
     /**
@@ -114,19 +135,10 @@ abstract class BaseObject extends Collection
      */
     public function __call($name, $arguments)
     {
-        $action = substr($name, 0, 3);
+        if (starts_with($name, 'get')) {
+            $property = substr($name, 3);
 
-        if ($action === 'get') {
-            $property = snake_case(substr($name, 3));
-            $response = $this->get($property);
-
-            // Map relative property to an object
-            $relations = $this->relations();
-            if (null != $response && isset($relations[$property])) {
-                return new $relations[$property]($response);
-            }
-
-            return $response;
+            return $this->getPropertyValue($property);
         }
 
         return false;

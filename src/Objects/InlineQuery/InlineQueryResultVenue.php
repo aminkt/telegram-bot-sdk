@@ -37,9 +37,5 @@ namespace Telegram\Bot\Objects\InlineQuery;
  */
 class InlineQueryResultVenue extends InlineBaseObject
 {
-    public function __construct($params = [])
-    {
-        parent::__construct($params);
-        $this->put('type', 'venue');
-    }
+    protected $type = 'venue';
 }

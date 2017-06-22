@@ -6,12 +6,15 @@ use Telegram\Bot\Answers\AnswerBus;
 use Telegram\Bot\Api;
 use Telegram\Bot\Objects\Update;
 use Telegram\Bot\Exceptions\TelegramSDKException;
+use Telegram\Bot\Traits\Singleton;
 
 /**
  * Class CommandBus.
  */
 class CommandBus extends AnswerBus
 {
+    use Singleton;
+
     /**
      * @var Command[] Holds all commands.
      */
@@ -25,11 +28,11 @@ class CommandBus extends AnswerBus
     /**
      * Instantiate Command Bus.
      *
-     * @param Api $telegram
+     * @param Api|null $telegram
      *
      * @throws TelegramSDKException
      */
-    public function __construct(Api $telegram)
+    public function __construct(Api $telegram = null)
     {
         $this->telegram = $telegram;
     }
@@ -196,10 +199,13 @@ class CommandBus extends AnswerBus
      */
     protected function handler($message, Update $update)
     {
+        if($message === null) {
+            return $update;
+        }
+
         $match = $this->parseCommand($message);
         if (!empty($match)) {
-            $command = strtolower($match[1]); //All commands must be lowercase.
-//            $bot = (!empty($match[2])) ? $match[2] : '';
+            $command = strtolower($match[1]); // All commands must be lowercase.
             $arguments = $match[3];
 
             $this->execute($command, $arguments, $update);
