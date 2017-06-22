@@ -12,7 +12,7 @@ trait CommandsHandler
     /**
      * Return Command Bus.
      *
-     * @return $this
+     * @return CommandBus
      */
     protected function getCommandBus()
     {
@@ -86,9 +86,52 @@ trait CommandsHandler
     {
         $message = $update->getMessage();
 
-        if($message !== null && $message->has('entities')) {
+        if($callBackQuery = $update->callbackQuery){
+            $this->getCommandBus()->handler($callBackQuery->data, $update);
+            return;
+        }
+        if($message == null)
+            return;
+
+        if($message->has('entities')) {
             if($message->entities[0]['type'] == 'bot_command') {
                 $this->getCommandBus()->handler($this->getMessageText($update), $update);
+            }
+        }elseif($update->getMessage() and $replyToMessage = $update->getMessage()->replyToMessage){
+            $this->handleReplyMessages($replyToMessage, $update);
+        }else{
+            $this->handleUserMessages($message, $update);
+        }
+    }
+
+    /**
+     * If user message is a replied message then this method handle it.
+     * @param $message \Telegram\Bot\Objects\Message
+     * @param $update Update
+     */
+    public function handleReplyMessages($message, $update){
+        $commands = $this->getCommandBus()->getCommands();
+        foreach ($commands as $command){
+            if(trim($message->text) == $command->getReplyTextTrigger()){
+                $arguments = [];
+                $arguments[] = $update->getMessage()->text;
+                $command->make($this, $arguments, $update);
+            }
+        }
+    }
+
+    /**
+     * Check user message and take a good action to reply
+     * @param $message \Telegram\Bot\Objects\Message
+     * @param $update Update
+     */
+    public function handleUserMessages($message, $update){
+        $commands = $this->getCommandBus()->getCommands();
+        foreach ($commands as $command){
+            if(in_array(trim($message->text), $command->getAliases())){
+                $arguments = [];
+                $arguments[] = $update->getMessage()->text;
+                $command->make($this, $arguments, $update);
             }
         }
     }

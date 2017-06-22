@@ -33,6 +33,12 @@ abstract class Command implements CommandInterface
     protected $name;
 
     /**
+     * This attribute help system to get user input to replay this message.
+     * @var $replyTextCommandTrigger
+     */
+    protected $replyTextTrigger=null;
+
+    /**
      * Command Aliases
      * Helpful when you want to trigger command with more than one name.
      *
@@ -106,6 +112,45 @@ abstract class Command implements CommandInterface
         $this->description = $description;
 
         return $this;
+    }
+
+    /**
+     * Get Command replyTextTrigger.
+     *
+     * @return string
+     */
+    public function getReplyTextTrigger()
+    {
+        return trim($this->replyTextTrigger);
+    }
+
+    /**
+     * Set replyTextTrigger
+     *
+     * @param $replyTextTrigger
+     *
+     * @return Command
+     */
+    public function setReplyTextTrigger($replyTextTrigger)
+    {
+        $this->replyTextTrigger = trim($replyTextTrigger);
+
+        return $this;
+    }
+
+    /**
+     * Handle errors
+     * @param $message
+     * @param bool $hint
+     */
+    public function error($message, $hint=true){
+        $message = $message.PHP_EOL;
+        if($hint)
+            $message.="```این مشکل ممکن است یک خطای سیستمی باشد. در صورتی که چنین فکر میکنید موضوع را به اطلاع ما برسانید.```";
+        $this->replyWithMessage([
+            'text'=>$message,
+            'parse_mode'=>'Markdown',
+        ]);
     }
 
     /**
