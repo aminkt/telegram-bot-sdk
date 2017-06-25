@@ -63,6 +63,7 @@ use Telegram\Bot\Traits\Http;
  *         messages sent by the bot or via the bot (for inline bots).
  * @method Methods\EditMessageReplyMarkup editMessageReplyMarkup(array $params = []) Use this method to edit only the
  *         reply markup of messages sent by the bot or via the bot (for inline bots).
+ * @method Methods\DeleteMessage deleteMessage(array $params = []) Use this method to delete text messages.
  *
  * # Inline Mode
  * @method Methods\AnswerInlineQuery answerInlineQuery(array $params = []) Use this method to send answers to an inline

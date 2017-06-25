@@ -56,6 +56,14 @@ abstract class Command implements CommandInterface
      */
     protected $arguments;
 
+
+    /**
+     * Run when an object created
+     */
+    public function init(){
+
+    }
+
     /**
      * Get Command Name.
      *
@@ -181,6 +189,8 @@ abstract class Command implements CommandInterface
         $this->telegram = $telegram;
         $this->arguments = $arguments;
         $this->update = $update;
+
+        $this->init();
 
         return $this->handle($arguments);
     }
