@@ -42,7 +42,7 @@ interface CommandInterface
      * Process Inbound Command.
      *
      * @param Api $telegram
-     * @param string $arguments
+     * @param array|null $arguments
      * @param Update $update
      *
      * @return mixed

@@ -146,7 +146,7 @@ trait CommandsHandler
      */
     public function triggerCommand($name, Update $update)
     {
-        return $this->getCommandBus()->execute($name, $this->getMessageText($update), $update);
+        return $this->getCommandBus()->execute($name, [$this->getMessageText($update)], $update);
     }
 
     /**

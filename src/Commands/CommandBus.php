@@ -204,9 +204,14 @@ class CommandBus extends AnswerBus
         }
 
         $match = $this->parseCommand($message);
+
         if (!empty($match)) {
             $command = strtolower($match[1]); // All commands must be lowercase.
             $arguments = $match[3];
+
+            if($arguments){
+                $arguments = explode(' ', $arguments);
+            }
 
             $this->execute($command, $arguments, $update);
         }
@@ -218,7 +223,7 @@ class CommandBus extends AnswerBus
      * Execute the command.
      *
      * @param $name
-     * @param $arguments
+     * @param array|null $arguments
      * @param $message
      *
      * @return mixed

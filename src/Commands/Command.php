@@ -192,7 +192,7 @@ abstract class Command implements CommandInterface
 
         $this->init();
 
-        return $this->handle($arguments);
+        return call_user_func_array(array($this, 'handle'), $arguments?$arguments:[]);
     }
 
     /**
@@ -205,11 +205,6 @@ abstract class Command implements CommandInterface
      */
     protected function triggerCommand($command, $arguments = null)
     {
-        return $this->getCommandBus()->execute($command, $arguments ?: $this->arguments, $this->update);
+        return $this->getCommandBus()->execute($command, $arguments ? $arguments : $this->arguments, $this->update);
     }
-
-    /**
-     * {@inheritdoc}
-     */
-    abstract public function handle($arguments);
 }
