@@ -209,11 +209,22 @@ class CommandBus extends AnswerBus
             $command = strtolower($match[1]); // All commands must be lowercase.
             $arguments = $match[3];
 
+            $args = [];
             if($arguments){
                 $arguments = explode(' ', $arguments);
-            }
+                $index = 0;
+                foreach ($arguments as $argument){
+                    preg_match('/^(?<key>[\w|\d]+)=(?<value>[\w|\d]+)/', $argument, $mates);
+                    if($mates){
+                        $args[$mates['key']] = $mates['value'];
+                    }else{
+                        $args[$index] = $argument;
+                    }
+                    $index++;
+                }
 
-            $this->execute($command, $arguments, $update);
+            }
+            $this->execute($command, $args, $update);
         }
 
         return $update;

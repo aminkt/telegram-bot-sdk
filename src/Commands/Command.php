@@ -2,6 +2,7 @@
 
 namespace Telegram\Bot\Commands;
 
+use ReflectionMethod;
 use Telegram\Bot\Answers\Answerable;
 use Telegram\Bot\Api;
 use Telegram\Bot\Objects\Update;
@@ -192,7 +193,35 @@ abstract class Command implements CommandInterface
 
         $this->init();
 
-        return call_user_func_array(array($this, 'handle'), $arguments?$arguments:[]);
+        $args = $this->bindMethodParams('handle', $arguments);
+
+        return call_user_func_array(array($this, 'handle'), $args);
+    }
+
+    /**
+     * Bind params to method.
+     * @param $method
+     * @param array $args
+     * @return array
+     */
+    public function bindMethodParams($method, $args) {
+        if(method_exists($this, $method)) {
+            $arguments = array();
+            $reflectionMethod = new ReflectionMethod($this,$method);
+            foreach($reflectionMethod->getParameters() as $parameter){
+                if(isset($args[$parameter->name])){
+                    $arguments[$parameter->name] = $args[$parameter->name];
+                } elseif(isset($args[$parameter->getPosition()])){
+                    $arguments[$parameter->getName()] = $args[$parameter->getPosition()];
+                } elseif($parameter->isDefaultValueAvailable()){
+                    $arguments[$parameter->name] = $parameter->getDefaultValue();
+                } else {
+                    $arguments[$parameter->name] = null;
+                }
+            }
+            return $arguments;
+        }
+        return $args?$args:[];
     }
 
     /**
