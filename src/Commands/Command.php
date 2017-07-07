@@ -153,9 +153,35 @@ abstract class Command implements CommandInterface
      * @param bool $hint
      */
     public function error($message, $hint=true){
-        $message = $message.PHP_EOL;
+        $message = '❌ '.$message.PHP_EOL;
         if($hint)
             $message.="```این مشکل ممکن است یک خطای سیستمی باشد. در صورتی که چنین فکر میکنید موضوع را به اطلاع ما برسانید.```";
+        $this->replyWithMessage([
+            'text'=>$message,
+            'parse_mode'=>'Markdown',
+        ]);
+    }
+
+    /**
+     * Handle info messages.
+     * @param $message
+     */
+    public function info($message){
+        $message = '❕ '.$message.PHP_EOL;
+
+        $this->replyWithMessage([
+            'text'=>$message,
+            'parse_mode'=>'Markdown',
+        ]);
+    }
+
+    /**
+     * Handle success messages.
+     * @param $message
+     */
+    public function success($message){
+        $message = '✅ '.$message.PHP_EOL;
+
         $this->replyWithMessage([
             'text'=>$message,
             'parse_mode'=>'Markdown',
