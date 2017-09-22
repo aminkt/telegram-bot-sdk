@@ -221,8 +221,31 @@ abstract class Command implements CommandInterface
 
         $args = $this->bindMethodParams('handle', $arguments);
 
-        return call_user_func_array(array($this, 'handle'), $args);
+        if ($this->beforeHandle()) {
+            $return = call_user_func_array(array($this, 'handle'), $args);
+            $this->afterHandle();
+            return $return;
+        }
+
+        return false;
     }
+
+    /**
+     * Event that execute right before handle method run.
+     */
+    public function beforeHandle()
+    {
+
+    }
+
+    /**
+     * Event that execute right after handle method run.
+     */
+    public function afterHandle()
+    {
+
+    }
+
 
     /**
      * Bind params to method.
