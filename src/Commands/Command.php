@@ -260,6 +260,20 @@ abstract class Command implements CommandInterface
      */
     protected function triggerCommand($command, $arguments = null)
     {
+        if(is_string($arguments)){
+            $string = explode(' ', $arguments);
+            $index = 0;
+            foreach ($string as $argument){
+                preg_match('/^(?<key>[\w|\d]+)=(?<value>[\w|\d]+)/', $argument, $matches);
+                if($matches){
+                    $args[$matches['key']] = $matches['value'];
+                }else{
+                    $args[$index] = $argument;
+                }
+                $index++;
+                $arguments = $args;
+            }
+        }
         return $this->getCommandBus()->execute($command, $arguments ? $arguments : $this->arguments, $this->update);
     }
 }
