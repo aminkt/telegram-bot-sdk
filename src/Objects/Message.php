@@ -86,6 +86,28 @@ class Message extends BaseObject
 
         return $this->detectType() === $type;
     }
+
+    /**
+     * Check if user request is a bot command or not.
+     *
+     * @return bool
+     */
+    public function isBotCommand()
+    {
+        if ($this->isType('bot_command'))
+            return true;
+
+        if (isset($this->entities)) {
+            if ($this->entities->type == 'bot_command')
+                return true;
+        }
+
+        if ($this->text[0] == '/') {
+            return true;
+        }
+
+        return false;
+    }
     
     
     /**
